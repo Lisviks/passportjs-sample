@@ -99,6 +99,11 @@ app.get('/protected', (req, res) => {
   res.json({ msg: 'protected route' });
 });
 
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.json({ msg: 'logged out' });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, console.log(`Server running on port ${PORT}`));
