@@ -8,7 +8,7 @@
   </head>
   <body>
     <h1>Passport Auth</h1>
-    <form action="/signup">
+    <form action="/signup" method="POST">
       <h3>Signup</h3>
       <label for="signup-email">Email</label>
       <input type="email" name="email" id="signup-email" required />
@@ -17,7 +17,7 @@
       <button type="submit">Signup</button>
     </form>
 
-    <form action="/signin">
+    <form action="/signin" method="POST">
       <h3>Signin</h3>
       <label for="signin-email">Email</label>
       <input type="email" name="email" id="signin-email" required />
