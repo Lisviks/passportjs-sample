@@ -7,6 +7,8 @@ const LocalStrategy = require('passport-local').Strategy;
 
 const User = require('./models/userModel');
 
+const { protect } = require('./middlewares/auth');
+
 require('dotenv').config();
 
 const app = express();
@@ -91,11 +93,7 @@ app.post(
   })
 );
 
-app.get('/protected', (req, res) => {
-  console.log(req.headers);
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ msg: 'not logged in' });
-  }
+app.get('/protected', protect, (req, res) => {
   res.json({ msg: 'protected route' });
 });
 
