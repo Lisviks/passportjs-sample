@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 
 const User = require('./models/userModel');
 
@@ -19,6 +21,44 @@ mongoose.connect(
   },
   console.log('MongoDB connected')
 );
+
+passport.use(
+  new LocalStrategy(
+    { usernameField: 'email' },
+    async (username, password, done) => {
+      try {
+        const user = await User.findOne({ email: username });
+
+        if (!user) {
+          return done(null, false);
+        }
+
+        const validPassword = await user.matchPassword(password);
+
+        if (validPassword) {
+          return done(null, user);
+        } else {
+          return done(null, false);
+        }
+      } catch (error) {
+        done(error);
+      }
+    }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.post('/signup', async (req, res) => {
   const userExists = await User.findOne({ email: req.body.email });
@@ -40,6 +80,14 @@ app.post('/signup', async (req, res) => {
     res.status(400).json({ msg: 'Invalid user data' });
   }
 });
+
+app.post(
+  '/login',
+  passport.authenticate('local', {
+    successRedirect: '/success.html',
+    failureRedirect: '/fail.html',
+  })
+);
 
 const PORT = process.env.PORT || 5000;
 
