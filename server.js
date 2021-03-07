@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
+const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
@@ -57,6 +58,7 @@ passport.deserializeUser((id, done) => {
   });
 });
 
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -88,6 +90,14 @@ app.post(
     failureRedirect: '/fail.html',
   })
 );
+
+app.get('/protected', (req, res) => {
+  console.log(req.headers);
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ msg: 'not logged in' });
+  }
+  res.json({ msg: 'protected route' });
+});
 
 const PORT = process.env.PORT || 5000;
 
